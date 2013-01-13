@@ -27,8 +27,8 @@ string LongestCommonPrefix::toString() {
 	stringstream ss;
 
 	ss << "\t\t<result type='DNA Sequence'>\n"; 
-	for (SuffixLocation suffixLocation : suffixLocations) {
-		ss << suffixLocation.toString(); 
+	for (Suffix* suffix : suffixes) {
+		ss << suffix->toString(length); 
 	}
 	ss << "\t\t\t"; 
 	ss << prefix; 
@@ -38,8 +38,8 @@ string LongestCommonPrefix::toString() {
 	return ss.str();
 }
 
-void LongestCommonPrefix::addSuffixLocation(SuffixLocation aLocation) {
-    suffixLocations.push_back(aLocation);
+void LongestCommonPrefix::addSuffix(Suffix*& aSuffix) {
+    suffixes.push_back(aSuffix);
 }
 
 string& LongestCommonPrefix::getPrefix() {
@@ -52,14 +52,4 @@ int& LongestCommonPrefix::getSortIndex() {
 
 int& LongestCommonPrefix::getLength() {
 	return length;
-}
-
-bool LongestCommonPrefix::isSingleStrand() {
-	set<string> strands;
-
-	for (SuffixLocation suffixLocation : suffixLocations) {
-		strands.insert(suffixLocation.getFileName());
-	}
-
-	return strands.size() == 1;
 }

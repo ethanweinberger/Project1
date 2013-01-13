@@ -6,9 +6,11 @@
  */
 
 #include "FastaFile.h"
+#include "Suffix.h"
 #include <sstream>
 #include <iostream>
 #include <fstream>
+#include <vector>
 using namespace std;
 
 FastaFile::FastaFile() {
@@ -76,7 +78,7 @@ void FastaFile::countBases(int counts[]) {
 
 }
 
-string FastaFile::getReverseComplement() {
+void FastaFile::createReverseComplement() {
         stringstream ss;
 
         // Append the complements in order
@@ -84,9 +86,9 @@ string FastaFile::getReverseComplement() {
                 ss << complement(dnaSequence[i]);
         }
 
-        // Reverse the string
+        // Reverse the string and set it to the reverseComplement attribute
 		string complement = ss.str();
-		return string(complement.rbegin(), complement.rend());
+		reverseComplement = string(complement.rbegin(), complement.rend());
     }
 
  char FastaFile::complement(char aChar) {
@@ -120,6 +122,8 @@ void FastaFile::populate() {
 		dnaSequence = ss.str();
 
 		inputFile.close();
+
+		createReverseComplement();
 }
 
 const int FastaFile::getSequenceLength() {
@@ -134,3 +138,17 @@ string& FastaFile::getDnaSequence() {
 	return dnaSequence;
 }
 
+void FastaFile::populateSuffixes(vector<Suffix*>& suffixes) {
+
+	// Create forward suffixes
+	int sequenceLength = dnaSequence.length();
+	for (int i = 0; i < sequenceLength; i++) {
+		suffixes.push_back(new Suffix(&dnaSequence[i], fileName, i+1, true));
+	}
+
+	// Create reverse suffixes
+	for (int i = 0; i < sequenceLength; i++) {
+		suffixes.push_back(new Suffix(&reverseComplement[i], fileName, sequenceLength -i + 1, false));
+	}
+
+}

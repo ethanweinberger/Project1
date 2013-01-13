@@ -10,6 +10,7 @@
 #include "FastaFile.h"
 #include <vector>
 #include <algorithm>
+#include <sstream>
 
 using namespace std;
 
@@ -34,11 +35,14 @@ void LongestCommonPrefixUtil::findLongestCommonPrefix(vector<LongestCommonPrefix
 
 	// Iterate the sufix list and compare adjacent suffixes
 	for (unsigned i = 0; i < suffixes.size() - 1  ; i++) {
-		char* suffix1 = suffixes[i];
-		char* suffix2 = suffixes[i+1];
+
 
 		// Only check for lcp if from different strands
-		if (!fromSameStrand(suffix1, suffix2)) {
+		if (suffixes[i]->getFileName().compare(suffixes[i+1]->getFileName()) != 0) {
+			// Get strands to compare
+			char* suffix1 = suffixes[i]->getDnaStrand();
+			char* suffix2 = suffixes[i+1]->getDnaStrand();
+
 			string lcpString = findLongestCommonPrefix(suffix1, suffix2);
 			int lcpLength = lcpString.length();
 
@@ -62,15 +66,15 @@ void LongestCommonPrefixUtil::findLongestCommonPrefix(vector<LongestCommonPrefix
 				// Add to collection of lcps (if not already there)
 				if (!alreadyExists) {
 					LongestCommonPrefix* lcp = new LongestCommonPrefix(lcpString, i);
-					lcp->addSuffixLocation(getSuffixLocationFor(suffix1));
-					lcp->addSuffixLocation(getSuffixLocationFor(suffix2));
+					lcp->addSuffix(suffixes[i]);
+					lcp->addSuffix(suffixes[i+1]);
 					lcps.push_back(lcp);
 				}
 			}
 		}
 	}
 
-	// Go back and look for matches that are adjacentn to the longest common prefix(es) that
+	// Go back and look for matches that are adjacent to the longest common prefix(es) that
 	// were found
 	for (LongestCommonPrefix* lcp : lcps) {
 		int lcpIndex = lcp->getSortIndex();
@@ -78,26 +82,26 @@ void LongestCommonPrefixUtil::findLongestCommonPrefix(vector<LongestCommonPrefix
 
 		// Search backwards
 		for (int i = lcpIndex - 1; i >= 0; i--) {
-			char* backwardsSuffix = suffixes[i];
-			char* lcpSuffix = suffixes[lcpIndex];
+			char* backwardsSuffix = suffixes[i]->getDnaStrand();
+			char* lcpSuffix = suffixes[lcpIndex]->getDnaStrand();
 			string lcpString = findLongestCommonPrefix(lcpSuffix, backwardsSuffix);
 
 			// Add to lcp if backwards suffix has same prefix as the lcp
-			if (lcpString.length() >= lcp->getLength())
-				lcp->addSuffixLocation(getSuffixLocationFor(backwardsSuffix));
+			if ((int)lcpString.length() >= lcp->getLength())
+				lcp->addSuffix(suffixes[i]);
 			else
 				break;
 		}
 
 		// Search forwards
-		for (int i = lcpIndex + 2; i < suffixes.size() - 1 ; i++) {
-			char* forwardsSuffix = suffixes[i];
-			char* lcpSuffix = suffixes[lcpIndex];
+		for (int i = lcpIndex + 2; i < (int)suffixes.size() - 1 ; i++) {
+			char* forwardsSuffix = suffixes[i]->getDnaStrand();
+			char* lcpSuffix = suffixes[lcpIndex]->getDnaStrand();
 			string lcpString = findLongestCommonPrefix(lcpSuffix, forwardsSuffix);
 
 			// Add to lcp if forwards suffix has same prefix as the lcp
-			if (lcpString.length() >= lcp->getLength())
-				lcp->addSuffixLocation(getSuffixLocationFor(forwardsSuffix));
+			if ((int)lcpString.length() >= lcp->getLength())
+				lcp->addSuffix(suffixes[i]);
 			else
 				break;
 		}
@@ -105,30 +109,17 @@ void LongestCommonPrefixUtil::findLongestCommonPrefix(vector<LongestCommonPrefix
 
 }
 
-bool LongestCommonPrefixUtil::isSingleStrand(LongestCommonPrefix lcp) {
-	return lcp.isSingleStrand();
-}
-
 void LongestCommonPrefixUtil::populateSuffixes() {
-	stringstream ss;
-	ss
-		<< fastaFile1.getDnaSequence() << '~'
-		<< fastaFile1.getReverseComplement() << '~'
-		<< fastaFile2.getDnaSequence() << '~'
-		<< fastaFile2.getReverseComplement() << '~';
 
-	suffixString = ss.str();
+	suffixes.reserve((fastaFile1.getSequenceLength() * 2) + fastaFile2.getSequenceLength() * 2);
+	fastaFile1.populateSuffixes(suffixes);
+	fastaFile2.populateSuffixes(suffixes);
 
-	suffixes.reserve(suffixString.length());
-	for (string::size_type i = 0; i < suffixString.length(); i++) {
-		suffixes.push_back(&suffixString[i]);
-	}
 	sort(suffixes.begin(), suffixes.end(), comparisonFunc);
 }
 
-bool LongestCommonPrefixUtil::comparisonFunc(const char *c1, const char *c2)
-{
-    return strcmp(c1, c2) < 0;
+bool LongestCommonPrefixUtil::comparisonFunc(Suffix* suffix1, Suffix* suffix2) {
+	return strcmp(suffix1->getDnaStrand(), suffix2->getDnaStrand()) < 0;
 }
 
 string LongestCommonPrefixUtil::findLongestCommonPrefix (char*& string1, char*& string2) {
@@ -149,56 +140,4 @@ string LongestCommonPrefixUtil::findLongestCommonPrefix (char*& string1, char*& 
 	return prefixStream.str();
 }
 
-SuffixLocation LongestCommonPrefixUtil::getSuffixLocationFor(char*& suffix) {
-	// Determine the minimum suffix size for each strand type
-	//    The suffix search strand is constructed as:
-	//       strand1forwared~strand1reverse~strand2forward~strand2reverse~
-	int strand1ForwardMin = strand1Length + 2 * strand2Length + 4;
-	int strand1ReverseMin = 2 * strand2Length + 3;
-	int strand2ForwardMin = strand2Length + 2;
-	int strand2ReverseMin = 0;
 
-	// Determine the file name and direction
-	string fileName;
-	bool isForward = true;
-	int location;
-	int suffixLength = strlen(suffix);
-
-	// If the suffix size is greater or equal to the minimum size for the strand1 reverse
-	// complement than it is from the first fasta file.
-	if (suffixLength >= strand1ReverseMin) {
-		fileName = fastaFile1.getFileName();
-		// Check for strand direction
-		if (suffixLength >= strand1ForwardMin) {
-			location = strand1ForwardMin + strand1Length + 1 - suffixLength;
-		}
-		else {
-			isForward = false;
-			location = strand1ForwardMin - suffixLength;
-		}
-	}
-	else {
-		fileName = fastaFile2.getFileName();
-		// Check for strand direction
-		if (suffixLength >= strand2ForwardMin) {
-			location = strand1ReverseMin - suffixLength;
-		}
-		else {
-			isForward = false;
-			location = strand2ForwardMin - suffixLength;
-		}
-	}
-
-	return SuffixLocation(fileName, location, isForward);
-}
-
-bool LongestCommonPrefixUtil::fromSameStrand(char*& suffix1, char*& suffix2) {
-	int strand1ReverseMin = 2 * strand2Length + 3;
-	int suffix1Length = strlen(suffix1);
-	int suffix2Length = strlen(suffix2);
-	if ((suffix1Length >= strand1ReverseMin && suffix2Length >= strand1ReverseMin)
-		  || (suffix1Length < strand1ReverseMin && suffix2Length < strand1ReverseMin))
-		return true;
-
-	return false;
-}

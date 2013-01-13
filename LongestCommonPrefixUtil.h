@@ -10,6 +10,7 @@
 
 #include "FastaFile.h"
 #include "LongestCommonPrefix.h"
+#include "Suffix.h"
 #include <string>
 #include <vector>
 using namespace std;
@@ -26,14 +27,12 @@ private:
 	FastaFile fastaFile1, fastaFile2;
 	string suffixString;
 	int strand1Length, strand2Length;
-	vector<char*> suffixes;
+	vector<Suffix*> suffixes;
 
 	void populateSuffixes();
 	string findLongestCommonPrefix (char*& string1, char*& string2);
-	SuffixLocation getSuffixLocationFor(char*& suffix);
-	bool fromSameStrand(char*& suffix1, char*& suffix2);
-	static bool comparisonFunc(const char *c1, const char *c2);
-	static bool LongestCommonPrefixUtil::isSingleStrand(LongestCommonPrefix lcp);
+	static bool comparisonFunc(Suffix* suffix1, Suffix* suffix2);
+
 
 };
 

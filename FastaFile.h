@@ -8,7 +8,10 @@
 #ifndef FASTAFILE_H
 #define FASTAFILE_H
 
+#include "Suffix.h"
 #include <string>
+#include <vector>
+
 using namespace std;
 
 class FastaFile {
@@ -20,18 +23,20 @@ public:
 
     string firstLineResultString();
     string baseCountsResultString();
-    string getReverseComplement();
 	const int getSequenceLength();
 	string& getFileName();
 	string& getDnaSequence();
+	void populateSuffixes(vector<Suffix*>& suffixes);
 
 private:
 	string filePath;
     string fileName;
     string firstLine;
     string dnaSequence;
+	string reverseComplement;
 
     void populate();
+    void createReverseComplement();
     char complement(char aChar);
     void countBases(int counts[]);
 

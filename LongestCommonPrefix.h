@@ -8,7 +8,7 @@
 #ifndef LONGESTCOMMONPREFIX_H
 #define LONGESTCOMMONPREFIX_H
 
-#include "SuffixLocation.h"
+#include "Suffix.h"
 #include <string>
 #include <vector>
 using namespace std;
@@ -22,14 +22,13 @@ public:
 	~LongestCommonPrefix();
 
     string toString(); 
-	void addSuffixLocation(SuffixLocation aLocation); 
+	void addSuffix(Suffix*& aSuffix); 
     string& getPrefix();
 	int& getLength();
-	bool isSingleStrand();
 	int& getSortIndex();
 
 private:
-	vector<SuffixLocation> suffixLocations;
+	vector<Suffix*> suffixes;
     string prefix;
 	int length;
 	int sortIndex;
