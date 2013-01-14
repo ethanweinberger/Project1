@@ -67,6 +67,11 @@ public:
 	//  Purpose:
 	//		Returns the string value of an XML element representing the first line of 
 	//		the Fasta file.
+	//
+	//		format:
+	//			<result type='first line' file='<<fileName>>' >
+	//				<<firstLine>>
+	//			</result>
 	//  Preconditions:
 	//		Fasta File has been read and firstLine has been populated
     string firstLineResultString();
@@ -75,6 +80,12 @@ public:
 	//  Purpose:
 	//		Returns the string value of an XML element representing the base counts 
 	//		of the dnaSequence.
+	//
+	//		format:
+	//			<result type='nucleotide histogram' file='<<fileName>>' >
+	//				A=<<baseCountForA>>,C=<<baseCountForC>>,G=<<baseCountForG>>,
+	//				A=<<baseCountForT>>,N=<<countForOtherChars>>
+	//			</result>
 	//  Preconditions:
 	//		Fasta File has been read and dnaSequence has been populated
     string baseCountsResultString();

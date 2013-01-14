@@ -40,8 +40,8 @@ void LongestCommonPrefixUtil::findLongestCommonPrefix(vector<LongestCommonPrefix
 		// Only check for lcp if from different strands
 		if (suffixes[i]->getFileName().compare(suffixes[i+1]->getFileName()) != 0) {
 			// Get strands to compare
-			char* suffix1 = suffixes[i]->getDnaStrand();
-			char* suffix2 = suffixes[i+1]->getDnaStrand();
+			char* suffix1 = suffixes[i]->getDnaSequence();
+			char* suffix2 = suffixes[i+1]->getDnaSequence();
 
 			string lcpString = findLongestCommonPrefix(suffix1, suffix2);
 			int lcpLength = lcpString.length();
@@ -82,8 +82,8 @@ void LongestCommonPrefixUtil::findLongestCommonPrefix(vector<LongestCommonPrefix
 
 		// Search backwards
 		for (int i = lcpIndex - 1; i >= 0; i--) {
-			char* backwardsSuffix = suffixes[i]->getDnaStrand();
-			char* lcpSuffix = suffixes[lcpIndex]->getDnaStrand();
+			char* backwardsSuffix = suffixes[i]->getDnaSequence();
+			char* lcpSuffix = suffixes[lcpIndex]->getDnaSequence();
 			string lcpString = findLongestCommonPrefix(lcpSuffix, backwardsSuffix);
 
 			// Add to lcp if backwards suffix has same prefix as the lcp
@@ -95,8 +95,8 @@ void LongestCommonPrefixUtil::findLongestCommonPrefix(vector<LongestCommonPrefix
 
 		// Search forwards
 		for (int i = lcpIndex + 2; i < (int)suffixes.size() - 1 ; i++) {
-			char* forwardsSuffix = suffixes[i]->getDnaStrand();
-			char* lcpSuffix = suffixes[lcpIndex]->getDnaStrand();
+			char* forwardsSuffix = suffixes[i]->getDnaSequence();
+			char* lcpSuffix = suffixes[lcpIndex]->getDnaSequence();
 			string lcpString = findLongestCommonPrefix(lcpSuffix, forwardsSuffix);
 
 			// Add to lcp if forwards suffix has same prefix as the lcp
@@ -119,7 +119,7 @@ void LongestCommonPrefixUtil::populateSuffixes() {
 }
 
 bool LongestCommonPrefixUtil::comparisonFunc(Suffix* suffix1, Suffix* suffix2) {
-	return strcmp(suffix1->getDnaStrand(), suffix2->getDnaStrand()) < 0;
+	return strcmp(suffix1->getDnaSequence(), suffix2->getDnaSequence()) < 0;
 }
 
 string LongestCommonPrefixUtil::findLongestCommonPrefix (char*& string1, char*& string2) {
