@@ -1,6 +1,14 @@
 /*
  * LongestCommonPrefixUtil.cpp
  *
+ * 	This is the cpp file for the LongestCommonPrefixUtil object. This is
+ *  a utility object that will find the longest common prefix from two 
+ *  two fasta files.
+ *
+ *  Typical use:
+ *		1. LongestCommonPrefixUtil(fastFile1, fastaFile2)
+ *		2. findLongestCommonPrefix(vector<LongestCommonPrefix> lcps)
+ *
  *  Created on: 1-10-13
  *      Author: tomkolar
  */
@@ -14,20 +22,37 @@
 
 using namespace std;
 
+// Constuctors
+// ==============================================
 LongestCommonPrefixUtil::LongestCommonPrefixUtil() {
 }
 
 LongestCommonPrefixUtil::LongestCommonPrefixUtil(FastaFile& file1, FastaFile& file2) {
 	fastaFile1 = file1;
 	fastaFile2 = file2;
-	strand1Length = file1.getSequenceLength();
-	strand2Length = file2.getSequenceLength();
 	populateSuffixes();
 }
 
+// Destructor
+// =============================================
 LongestCommonPrefixUtil::~LongestCommonPrefixUtil() {
 }
 
+// Public Methods
+// =============================================
+
+// findLongestCommonPrefix(vector<LongestCommonPrefix*>& lcps)
+//  Purpose:
+//		Find the longest common prefix for the two fasta files associated
+//		with this utility object.  Populates the passed in lcps vector
+//		with the longest common prefixes found.  Note that there may be
+//		more than one longest common prefix if the prefixes have the same
+//		length.
+//	Preconditions:
+//		fastaFile1 and fastFile2 have been populated
+//	Postconditions:
+//		The passed in lcps vector will be populated with LongestCommonPrefix objects
+//		representing the longest commmon prefix(es) between the two fasta files.
 void LongestCommonPrefixUtil::findLongestCommonPrefix(vector<LongestCommonPrefix*>& lcps) {
 
 	// Find the longest common prefix(es)
@@ -109,6 +134,18 @@ void LongestCommonPrefixUtil::findLongestCommonPrefix(vector<LongestCommonPrefix
 
 }
 
+// Private Methods
+// =============================================
+
+// populateSuffixes()
+//  Purpose:
+//		populate the suffixes vector with the the suffixes from
+//		the two fasta files, then sort them in lexicographical order
+//	Preconditions:
+//		fastaFile1 and fastFile2 have been populated
+//	Postconditions:
+//		suffixes vector containes a sorted list of all suffixes from 
+//		the two fasta files
 void LongestCommonPrefixUtil::populateSuffixes() {
 
 	suffixes.reserve((fastaFile1.getSequenceLength() * 2) + fastaFile2.getSequenceLength() * 2);
@@ -118,10 +155,9 @@ void LongestCommonPrefixUtil::populateSuffixes() {
 	sort(suffixes.begin(), suffixes.end(), comparisonFunc);
 }
 
-bool LongestCommonPrefixUtil::comparisonFunc(Suffix* suffix1, Suffix* suffix2) {
-	return strcmp(suffix1->getDnaSequence(), suffix2->getDnaSequence()) < 0;
-}
-
+// string findLongestCommonPrefix (char*& string1, char*& string2)
+//  Purpose:
+//		returns the longest common prefix between the two strings
 string LongestCommonPrefixUtil::findLongestCommonPrefix (char*& string1, char*& string2) {
 
 	int maxLength = min(strlen(string1), strlen(string2));
@@ -140,4 +176,10 @@ string LongestCommonPrefixUtil::findLongestCommonPrefix (char*& string1, char*& 
 	return prefixStream.str();
 }
 
+// bool comparisonFunc(Suffix* suffix1, Suffix* suffix2)
+//  Purpose:
+//		comparsion function for sorting Suffix objects
+bool LongestCommonPrefixUtil::comparisonFunc(Suffix* suffix1, Suffix* suffix2) {
+	return strcmp(suffix1->getDnaSequence(), suffix2->getDnaSequence()) < 0;
+}
 

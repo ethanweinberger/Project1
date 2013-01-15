@@ -1,7 +1,7 @@
 /*
  * Suffix.h
  *
- *	This is the cpp file for the SUffix object. The Suffix object represents a
+ *	This is the header file for the SUffix object. The Suffix object represents a
  *  particular suffix from a DNA sequence.  The main attributes of this suffix
  *  are: 
  *		dnaStrand - the sequence of DNA Bases that form the suffix
