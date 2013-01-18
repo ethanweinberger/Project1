@@ -94,9 +94,9 @@ void FastaFile::populateSuffixes(vector<Suffix*>& suffixes) {
 string FastaFile::firstLineResultString() {
 	stringstream ss;
 
-	ss << "\t\t<result type='first line' file='" << fileName << "'>\n";
-	ss << "\t\t\t" << firstLine << "\n";
-	ss << "\t\t</result>\n";
+	ss << "    <result type='first line' file='" << fileName << "'>\n";
+	ss << "      " << firstLine << "\n";
+	ss << "    </result>\n";
 
 	return ss.str();
 }
@@ -117,13 +117,13 @@ string FastaFile::baseCountsResultString() {
 	stringstream ss;
 
 	// Header
-	ss <<  "\t\t<result type='nucleotide histogram' file='" << fileName << "'>\n";
+	ss <<  "    <result type='nucleotide histogram' file='" << fileName << "'>\n";
 
 	// Base Counts
 	int baseCounts[5] = {0};
 	countBases(baseCounts);
 
-	ss << "\t\t\t";
+	ss << "      ";
 	ss << "A=" << baseCounts[0];
 	ss << ",C=" << baseCounts[1];
 	ss << ",G=" << baseCounts[2];
@@ -134,7 +134,7 @@ string FastaFile::baseCountsResultString() {
 	ss << "\n";
 
 	// Footer
-	ss << "\t\t</result>\n";
+	ss << "    </result>\n";
 
 	return ss.str();
 }

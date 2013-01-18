@@ -61,15 +61,15 @@ Suffix::~Suffix() {
 string Suffix::toString(int prefixSize) {
 	stringstream ss;
 
-	ss << "\t\t\t<location file='";
+	ss << "      <location file='";
 	ss << fileName;
 	ss << "' strand='";
 	ss << (forward?"forward":"reverse");
 	ss << "'>\n";
-	ss << "\t\t\t\t";
+	ss << "        ";
 	ss << (forward?location:location-prefixSize);
 	ss << "\n";
-	ss << "\t\t\t</location>\n";
+	ss << "      </location>\n";
 
 	return ss.str();
 }

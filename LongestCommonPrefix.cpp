@@ -75,14 +75,14 @@ void LongestCommonPrefix::addSuffix(Suffix*& aSuffix) {
 string LongestCommonPrefix::toString() {
 	stringstream ss;
 
-	ss << "\t\t<result type='DNA Sequence'>\n"; 
+	ss << "    <result type='DNA Sequence'>\n"; 
 	for (Suffix* suffix : suffixes) {
 		ss << suffix->toString(length); 
 	}
-	ss << "\t\t\t"; 
+	ss << "      "; 
 	ss << prefix; 
 	ss << "\n"; 
-	ss << "\t\t</result>\n"; 
+	ss << "    </result>\n"; 
 
 	return ss.str();
 }

@@ -19,6 +19,7 @@
 #include <vector>
 #include <algorithm>
 #include <sstream>
+#include <string.h>
 
 using namespace std;
 
@@ -36,6 +37,10 @@ LongestCommonPrefixUtil::LongestCommonPrefixUtil(FastaFile& file1, FastaFile& fi
 // Destructor
 // =============================================
 LongestCommonPrefixUtil::~LongestCommonPrefixUtil() {
+	// Clean up suffixes vector
+	for (std::vector<Suffix *>::iterator it = suffixes.begin(); it != suffixes.end(); ++it) {
+		delete *it;
+	}
 }
 
 // Public Methods
@@ -75,6 +80,9 @@ void LongestCommonPrefixUtil::findLongestCommonPrefix(vector<LongestCommonPrefix
 			if (lcpLength >= longestSoFar) {
 				// If new longest length then clear lcps and reset longestSoFar
 				if (lcpLength > longestSoFar) {
+					for (std::vector<LongestCommonPrefix *>::iterator it = lcps.begin(); it != lcps.end(); ++it) {
+						delete *it;
+					}
 					lcps.clear();
 					longestSoFar = lcpLength;
 				}
